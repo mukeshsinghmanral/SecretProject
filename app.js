@@ -1,3 +1,7 @@
+//just want to add one more functionality , when user is already logged in using OAuth, then if user is registering manualy,
+// the password should get updated on the same email in the database, right now we cannot login using manual if user is already logged in using OAuth 
+
+
 require("dotenv").config();
 const express = require("express");
 
@@ -9,13 +13,14 @@ const app = express();
 
 const mongoose = require("mongoose");
 
-
+app.use(express.json());
 const session= require('express-session');
 const passportLocalMongoose= require('passport-local-mongoose');
 const passport= require('passport');
+const findOrCreate= require('mongoose-findorcreate');
 
 const GoogleStrategy= require('passport-google-oauth20').Strategy;
-
+const LinkedinStrategy= require('passport-linkedin-oauth2').Strategy;
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
@@ -46,9 +51,11 @@ mongoose.connect(DB)
 const userSchema = new mongoose.Schema({
   email: String,
   googleId : String,
-  secret : String
+  secret : String,
+  linkedinId : String
 });
 userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(findOrCreate);
 
 
 //userSchema.plugin(encrypt,{secret:process.env.SECRET, encryptedFields:['password']});
@@ -99,11 +106,44 @@ async (accessToken, refreshToken, profile, cb) => {
           await newUser.save(); 
           return cb(null, newUser); 
       }
-  } catch (err) {
+  }catch (err) {
       return cb(err, null);
   }
 }));
+passport.use(new LinkedinStrategy({
+  clientID: process.env.LINKEDIN_CLIENT_ID,
+  clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+  callbackURL: "http://localhost:3000/auth/linkedin/secrets",
+  scope: ['email','profile','openid'],
+   
+},
+async (accessToken, refreshToken, profile, cb) => {
+  try {
+    
+      const existingUser = await User.findOne({ username: profile.email});
+      
+      if (existingUser) {
+         
+          if (!existingUser.linkedinId) {
+              existingUser.linkedinId = profile.id;
+              await existingUser.save(); 
+          }
+          return cb(null, existingUser); 
+      } else {
+          
+          const newUser = new User({
+              linkedinId: profile.id,
+              username: profile.email,
+             
+          });
 
+          await newUser.save(); 
+          return cb(null, newUser); 
+      }
+  }catch (err) {
+      return cb(err, null);
+  }
+}));
 
 app.get("/", (req, res) => {
   res.render("home");
@@ -117,6 +157,17 @@ app.get("/auth/google/secrets", passport.authenticate("google", {failureRedirect
       (req,res)=>{
       res.redirect("/secrets");
     }
+);
+app.get("/auth/linkedin", 
+  passport.authenticate('linkedin', {state : "state2" })
+);
+
+app.get("/auth/linkedin/secrets", 
+  passport.authenticate("linkedin", { failureRedirect: "/login" }),
+  (req, res) => {
+    // Successful authentication, redirect to secrets.
+    res.redirect("/secrets");
+  }
 );
 app.get("/login", (req, res) => {
   res.render("login");
