@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 const app = express();
 
 const mongoose = require("mongoose");
-const findOrCreate= require("mongoose-findorcreate");
+
 
 const session= require('express-session');
 const passportLocalMongoose= require('passport-local-mongoose');
@@ -35,7 +35,13 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect("mongodb://127.0.0.1:27017/userDB");
+const DB=process.env.DATABASE;
+mongoose.connect(DB)
+.then(()=>{
+  console.log("DB connected");
+}).catch((err)=>{
+  console.log(err);
+});
 
 const userSchema = new mongoose.Schema({
   email: String,
@@ -43,7 +49,7 @@ const userSchema = new mongoose.Schema({
   secret : String
 });
 userSchema.plugin(passportLocalMongoose);
-userSchema.plugin(findOrCreate);
+
 
 //userSchema.plugin(encrypt,{secret:process.env.SECRET, encryptedFields:['password']});
 
@@ -134,6 +140,7 @@ app.get('/secrets',(req,res)=>{
 
 app.get('/logout',(req,res)=>{
   req.logout((err)=>{
+    if(err)
     console.log(err);
   });
 
