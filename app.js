@@ -13,6 +13,12 @@ const app = express();
 
 const mongoose = require("mongoose");
 
+app.use(cors({
+  origin: [""],
+  methods: ["POST", "GET"],
+  credentials: true
+}));
+
 app.use(express.json());
 const session= require('express-session');
 const passportLocalMongoose= require('passport-local-mongoose');
@@ -265,8 +271,6 @@ app.post("/submit",(req,res)=>{
 
 });
 
-
-const PORT = 3000;
-app.listen(PORT, (req, res) => {
-  console.log(`server is running on ${PORT}`);
+app.listen(process.env.PORT || 3000, (req, res) => {
+  console.log(`server is running on ${process.env.PORT || 3000}`);
 });
