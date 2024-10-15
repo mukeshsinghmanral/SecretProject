@@ -6,7 +6,7 @@
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "frontend/index.ejs"
+        "dest": "frontend/views/index.ejs"
       }
     ]
   }
