@@ -82,7 +82,7 @@ passport.deserializeUser(function(user, cb) {
 passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/secrets",
+  callbackURL: "https://secretproject-a18b.onrender.com/auth/google/secrets",
   userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
 },
 async (accessToken, refreshToken, profile, cb) => {
@@ -115,7 +115,7 @@ async (accessToken, refreshToken, profile, cb) => {
 passport.use(new LinkedinStrategy({
   clientID: process.env.LINKEDIN_CLIENT_ID,
   clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/linkedin/secrets",
+  callbackURL: "https://secretproject-a18b.onrender.com/auth/linkedin/secrets",
   scope: ['email','profile','openid'],
    
 },
