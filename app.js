@@ -115,7 +115,7 @@ async (accessToken, refreshToken, profile, cb) => {
 passport.use(new LinkedinStrategy({
   clientID: process.env.LINKEDIN_CLIENT_ID,
   clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/linkedin/secrets",
+  callbackURL: "https://secretproject-a18b.onrender.com/auth/linkedin/secrets",
   scope: ['email','profile','openid'],
    
 },
