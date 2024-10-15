@@ -148,7 +148,7 @@ async (accessToken, refreshToken, profile, cb) => {
 }));
 
 app.get("/", (req, res) => {
-  res.render("index");
+  res.status(200).send("hello from server")
 });
 
 app.get('/auth/google',
