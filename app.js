@@ -13,7 +13,7 @@ const app = express();
 
 const mongoose = require("mongoose");
 
-cors
+
 
 app.use(express.json());
 const session= require('express-session');
